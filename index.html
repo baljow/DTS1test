@@ -303,7 +303,7 @@
             color: #6c757d;
         }
         
-        /* QR Code Print Styles */
+        /* QR Code Container Styles */
         .qr-container {
             background-color: white;
             border: 2px solid #2c3e50;
@@ -314,31 +314,25 @@
             text-align: center;
         }
         
-        .qr-print-btn {
-            background-color: #28a745;
-            margin-top: 10px;
-        }
-        
-        .qr-print-btn:hover {
-            background-color: #218838;
-        }
-        
-        /* Standalone QR Generator Styles */
-        .qr-generator-section {
-            background-color: #e3f2fd;
-            border-left: 4px solid #2196f3;
+        .qr-fallback {
+            border: 3px dashed #3498db;
+            background-color: #f8f9fa;
             padding: 20px;
-            margin-bottom: 20px;
+            margin: 15px 0;
             border-radius: 8px;
         }
         
-        .qr-result {
-            margin-top: 20px;
-            text-align: center;
-            padding: 20px;
+        .tracking-id-display {
+            font-family: monospace;
+            font-size: 20px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 10px 0;
+            letter-spacing: 1px;
             background-color: white;
-            border-radius: 8px;
-            border: 2px solid #ddd;
+            padding: 10px;
+            border-radius: 4px;
+            word-break: break-all;
         }
         
         /* Print Styles for 57mm paper */
@@ -347,11 +341,11 @@
                 visibility: hidden;
             }
             
-            .qr-print-section, .qr-print-section * {
+            .print-content, .print-content * {
                 visibility: visible;
             }
             
-            .qr-print-section {
+            .print-content {
                 position: absolute;
                 left: 0;
                 top: 0;
@@ -361,21 +355,21 @@
                 background: white;
             }
             
-            .qr-print-title {
+            .print-header {
                 font-size: 10pt;
                 font-weight: bold;
                 margin-bottom: 2mm;
                 text-align: center;
             }
             
-            .qr-print-canvas {
+            .print-qr {
                 display: block;
                 margin: 2mm auto;
                 width: 40mm !important;
                 height: 40mm !important;
             }
             
-            .qr-print-id {
+            .print-text {
                 font-family: monospace;
                 font-size: 8pt;
                 font-weight: bold;
@@ -384,7 +378,7 @@
                 word-break: break-all;
             }
             
-            .qr-print-info {
+            .print-info {
                 font-size: 7pt;
                 text-align: center;
                 margin-top: 2mm;
@@ -431,7 +425,7 @@
         </div>
     </div>
 
-    <!-- Main Application (Hidden until login) -->
+    <!-- Main Application -->
     <div id="mainApp" class="hidden">
         <div class="user-info">
             <span id="welcomeMessage">Welcome!</span>
@@ -446,7 +440,6 @@
         <div id="adminNav" class="admin-nav hidden">
             <button onclick="showSection('documents')" id="documentsBtn" class="active">📋 Documents</button>
             <button onclick="showSection('scanner')" id="scannerBtn">📱 QR Scanner</button>
-            <button onclick="showSection('qrgenerator')" id="qrGeneratorBtn">🔧 QR Generator</button>
             <button onclick="showSection('users')" id="usersBtn">👥 Manage Users</button>
         </div>
         
@@ -454,7 +447,6 @@
         <div id="userNav" class="admin-nav hidden">
             <button onclick="showSection('documents')" id="userDocumentsBtn" class="active">📋 Documents</button>
             <button onclick="showSection('scanner')" id="userScannerBtn">📱 QR Scanner</button>
-            <button onclick="showSection('qrgenerator')" id="userQrGeneratorBtn">🔧 QR Generator</button>
         </div>
 
         <!-- QR Scanner Section -->
@@ -481,37 +473,7 @@
             </div>
         </div>
 
-        <!-- Standalone QR Generator Section -->
-        <div id="qrGeneratorSection" class="form-section hidden">
-            <h2>🔧 QR Code Generator</h2>
-            
-            <div class="qr-generator-section">
-                <h3>📱 Generate QR Code</h3>
-                <p>Create QR codes for any text, URL, or tracking ID:</p>
-                
-                <div class="form-group">
-                    <label for="qrText">Text to encode:</label>
-                    <input type="text" id="qrText" placeholder="Enter tracking ID, URL, or any text" maxlength="200">
-                </div>
-                
-                <div class="form-group">
-                    <label for="qrSize">QR Code Size:</label>
-                    <select id="qrSize">
-                        <option value="150">Small (150x150)</option>
-                        <option value="200" selected>Medium (200x200)</option>
-                        <option value="300">Large (300x300)</option>
-                    </select>
-                </div>
-                
-                <button onclick="generateStandaloneQR()" style="background-color: #2196f3;">🔧 Generate QR Code</button>
-                <button onclick="clearQRGenerator()" style="background-color: #6c757d;">🗑️ Clear</button>
-            </div>
-            
-            <div id="standaloneQRResult" class="qr-result hidden">
-                <!-- Generated QR code will appear here -->
-            </div>
-        </div>
-
+        <!-- Document Form Section -->
         <div class="form-section" id="documentFormSection">
             <h2>📝 Submit New Document</h2>
             <form id="documentForm">
@@ -574,7 +536,7 @@
             </div>
         </div>
 
-        <!-- User Management Section (Admin Only) -->
+        <!-- User Management Section -->
         <div id="userManagementSection" class="form-section hidden">
             <h2>👥 User Management</h2>
             
@@ -632,6 +594,7 @@
             </div>
         </div>
 
+        <!-- Document List -->
         <div class="document-list">
             <h2>📋 Document Tracking</h2>
             
@@ -643,7 +606,7 @@
                     id="documentSearch" 
                     class="search-box" 
                     placeholder="Search by tracking ID, title, department, or status..." 
-                    onkeyup="searchDocuments()"
+                    oninput="searchDocuments()"
                 >
                 <div id="searchResults" class="search-results-info"></div>
             </div>
@@ -654,21 +617,59 @@
         </div>
     </div>
 
-    <!-- Hidden QR Print Section -->
-    <div id="qrPrintSection" class="qr-print-section" style="display: none;">
-        <div class="qr-print-title">Document Tracking</div>
-        <canvas id="qrPrintCanvas" class="qr-print-canvas"></canvas>
-        <div id="qrPrintId" class="qr-print-id"></div>
-        <div class="qr-print-info">
+    <!-- Hidden Print Section -->
+    <div id="printContent" class="print-content" style="display: none;">
+        <div class="print-header">Document Tracking</div>
+        <canvas id="printCanvas" class="print-qr"></canvas>
+        <div id="printText" class="print-text"></div>
+        <div class="print-info">
             <div>Local Government</div>
             <div>Document Tracking System</div>
-            <div id="qrPrintDate"></div>
+            <div id="printDate"></div>
         </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.3/qrcode.min.js"></script>
+    <!-- QR Code Library with Multiple Fallbacks -->
     <script>
-        // Default users (will be saved to localStorage on first run)
+        // Try to load QR library with multiple CDNs
+        function loadQRLibrary() {
+            const cdns = [
+                'https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js',
+                'https://unpkg.com/qrcode@1.5.3/build/qrcode.min.js',
+                'https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.3/qrcode.min.js'
+            ];
+            
+            let currentCDN = 0;
+            
+            function tryLoadScript() {
+                if (currentCDN >= cdns.length) {
+                    console.log('All QR CDNs failed, using fallback mode');
+                    window.QRLibraryFailed = true;
+                    return;
+                }
+                
+                const script = document.createElement('script');
+                script.src = cdns[currentCDN];
+                script.onload = function() {
+                    console.log(`QR library loaded from: ${cdns[currentCDN]}`);
+                };
+                script.onerror = function() {
+                    console.log(`Failed to load from: ${cdns[currentCDN]}`);
+                    currentCDN++;
+                    tryLoadScript();
+                };
+                document.head.appendChild(script);
+            }
+            
+            tryLoadScript();
+        }
+        
+        // Load the QR library
+        loadQRLibrary();
+    </script>
+
+    <script>
+        // Application Variables
         const defaultUsers = {
             'MYO': { password: '123', department: "Mayor's Office", role: 'user', name: "Mayor's Office User" },
             'MBO': { password: '123', department: 'Budget Office', role: 'user', name: 'Budget Office User' },
@@ -683,12 +684,13 @@
         let documents = [];
         let filteredDocuments = [];
 
-        // Check if user is already logged in when page loads
+        // Initialize Application
         window.addEventListener('load', function() {
             loadUsers();
             loadDocuments();
             setupEventListeners();
             
+            // Check if user is already logged in
             const savedUser = localStorage.getItem('currentUser');
             if (savedUser) {
                 currentUser = JSON.parse(savedUser);
@@ -696,8 +698,9 @@
             }
         });
 
+        // Event Listeners Setup
         function setupEventListeners() {
-            // Login form handler
+            // Login form
             document.getElementById('loginForm').addEventListener('submit', function(e) {
                 e.preventDefault();
                 
@@ -710,9 +713,7 @@
                         ...users[username]
                     };
                     
-                    // Save login status
                     localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                    
                     showMainApp();
                     document.getElementById('loginForm').reset();
                 } else {
@@ -720,13 +721,10 @@
                 }
             });
 
-            // Document form handler
+            // Document form
             document.getElementById('documentForm').addEventListener('submit', function(e) {
                 e.preventDefault();
                 
-                console.log('Document form submitted!'); // Debug log
-                
-                // Get form data
                 const title = document.getElementById('documentTitle').value;
                 const documentType = document.getElementById('documentType').value;
                 const fromDept = document.getElementById('fromDepartment').value;
@@ -734,15 +732,12 @@
                 const description = document.getElementById('description').value;
                 const file = document.getElementById('documentFile').files[0];
                 
-                console.log('Form data:', { title, documentType, fromDept, toDept }); // Debug log
-                
-                // Validate required fields
+                // Validation
                 if (!title || !documentType || !fromDept || !toDept) {
                     alert('❌ Please fill in all required fields!');
                     return;
                 }
                 
-                // Validate department permissions
                 if (currentUser.role !== 'admin' && fromDept !== currentUser.department) {
                     alert('❌ You can only submit documents from your own department!');
                     return;
@@ -753,7 +748,7 @@
                     return;
                 }
                 
-                // Generate tracking ID based on document type
+                // Generate tracking ID
                 let prefix = 'DOC';
                 if (documentType === 'ACTIVITY DESIGN') prefix = 'AD';
                 else if (documentType === 'PURCHASE REQUEST') prefix = 'PR';
@@ -761,7 +756,7 @@
                 
                 const trackingId = `${prefix}-2025-${String(documentCounter).padStart(3, '0')}`;
                 
-                // Create document object
+                // Create document
                 const newDocument = {
                     id: trackingId,
                     title: title,
@@ -783,31 +778,21 @@
                     }]
                 };
                 
-                // Add to documents array
                 documents.push(newDocument);
-                
-                // Save to localStorage
                 saveDocuments();
-                
-                // Generate QR Code
                 generateQRCode(trackingId, title, documentType);
-                
-                // Update document list
                 updateDocumentsList();
                 
-                // Clear form
                 this.reset();
                 if (currentUser.role !== 'admin') {
                     document.getElementById('fromDepartment').value = currentUser.department;
                 }
                 
-                // Increment counter
                 documentCounter++;
-                
-                alert(`✅ Document submitted successfully!\nTracking ID: ${trackingId}\nType: ${documentType}\n\n📱 The receiving department can scan the QR code to process this document.`);
+                alert(`✅ Document submitted successfully!\nTracking ID: ${trackingId}\nType: ${documentType}`);
             });
 
-            // Add User Form Handler
+            // Add User Form
             document.getElementById('addUserForm').addEventListener('submit', function(e) {
                 e.preventDefault();
                 
@@ -817,29 +802,20 @@
                 const name = document.getElementById('newUserName').value.trim();
                 const role = document.getElementById('newUserRole').value;
                 
-                // Check if username already exists
                 if (users[username]) {
-                    alert('❌ Username already exists! Please choose a different username.');
+                    alert('❌ Username already exists!');
                     return;
                 }
                 
-                // Add new user
-                users[username] = {
-                    password: password,
-                    department: department,
-                    role: role,
-                    name: name
-                };
-                
+                users[username] = { password, department, role, name };
                 saveUsers();
                 this.reset();
                 updateUsersList();
-                
                 alert(`✅ User "${username}" added successfully!`);
             });
         }
 
-        // Search function
+        // Search Function
         function searchDocuments() {
             const searchTerm = document.getElementById('documentSearch').value.toLowerCase().trim();
             const searchResults = document.getElementById('searchResults');
@@ -865,9 +841,9 @@
             displayDocuments(filteredDocuments);
         }
 
+        // Get visible documents based on user permissions
         function getVisibleDocuments() {
             if (currentUser.role !== 'admin') {
-                // Regular users can only see documents from or to their department
                 return documents.filter(doc => 
                     doc.from === currentUser.department || 
                     doc.to === currentUser.department ||
@@ -877,6 +853,7 @@
             return documents;
         }
 
+        // Display documents
         function displayDocuments(docList) {
             const listDiv = document.getElementById('documentsList');
             
@@ -888,7 +865,6 @@
             }
             
             listDiv.innerHTML = docList.map(doc => {
-                // Get document type styling
                 let typeClass = '';
                 let typeIcon = '📄';
                 if (doc.type === 'ACTIVITY DESIGN') { typeClass = 'activity'; typeIcon = '📋'; }
@@ -916,12 +892,238 @@
             }).join('');
         }
 
+        // QR Code Generation with Fallback
+        function generateQRCode(trackingId, title, documentType) {
+            const qrCodeDiv = document.getElementById('qrcode');
+            qrCodeDiv.innerHTML = '';
+            
+            // Check if QR library is available
+            if (typeof QRCode === 'undefined' || window.QRLibraryFailed) {
+                showQRFallback(trackingId, title, documentType);
+                return;
+            }
+            
+            const container = document.createElement('div');
+            container.className = 'qr-container';
+            
+            const titleElem = document.createElement('h4');
+            titleElem.textContent = '📱 QR Code Generated';
+            titleElem.style.margin = '0 0 15px 0';
+            titleElem.style.color = '#2c3e50';
+            container.appendChild(titleElem);
+            
+            const canvas = document.createElement('canvas');
+            container.appendChild(canvas);
+            
+            QRCode.toCanvas(canvas, trackingId, {
+                width: 200,
+                height: 200,
+                margin: 2,
+                colorDark: '#2c3e50',
+                colorLight: '#ffffff',
+                errorCorrectionLevel: 'M'
+            }, function (error) {
+                if (error) {
+                    console.error('QR generation error:', error);
+                    showQRFallback(trackingId, title, documentType);
+                    return;
+                }
+                
+                // Add tracking ID
+                const trackingText = document.createElement('p');
+                trackingText.innerHTML = `<strong>Tracking ID:</strong> ${trackingId}`;
+                trackingText.style.margin = '10px 0';
+                trackingText.style.fontFamily = 'monospace';
+                trackingText.style.fontSize = '14px';
+                container.appendChild(trackingText);
+                
+                // Add document info
+                const docInfo = document.createElement('p');
+                docInfo.innerHTML = `<strong>Document:</strong> ${title}<br><strong>Type:</strong> ${documentType}`;
+                docInfo.style.margin = '10px 0';
+                docInfo.style.fontSize = '12px';
+                docInfo.style.color = '#666';
+                container.appendChild(docInfo);
+                
+                // Add buttons
+                const buttonContainer = document.createElement('div');
+                buttonContainer.style.marginTop = '15px';
+                
+                // Download button
+                const downloadBtn = document.createElement('button');
+                downloadBtn.textContent = '📥 Download QR';
+                downloadBtn.onclick = function() {
+                    const link = document.createElement('a');
+                    link.download = `QR-${trackingId}.png`;
+                    link.href = canvas.toDataURL();
+                    link.click();
+                };
+                buttonContainer.appendChild(downloadBtn);
+                
+                // Print button
+                const printBtn = document.createElement('button');
+                printBtn.textContent = '🖨️ Print (57mm)';
+                printBtn.style.backgroundColor = '#28a745';
+                printBtn.onclick = function() {
+                    printQRCode(trackingId, canvas);
+                };
+                buttonContainer.appendChild(printBtn);
+                
+                container.appendChild(buttonContainer);
+                
+                // Add instructions
+                const instructions = document.createElement('div');
+                instructions.innerHTML = `
+                    <p style="margin-top: 15px; font-size: 14px; color: #2c3e50; text-align: left;">
+                        <strong>📋 Instructions:</strong><br>
+                        1. Print or share this QR code<br>
+                        2. Receiving department scans the QR code<br>
+                        3. They can update status and forward the document
+                    </p>
+                `;
+                container.appendChild(instructions);
+                
+                qrCodeDiv.appendChild(container);
+                qrCodeDiv.style.display = 'block';
+            });
+        }
+
+        // QR Fallback when library fails
+        function showQRFallback(trackingId, title, documentType) {
+            const qrCodeDiv = document.getElementById('qrcode');
+            
+            qrCodeDiv.innerHTML = `
+                <div class="qr-container">
+                    <h4 style="margin: 0 0 15px 0; color: #2c3e50;">📱 QR Code Alternative</h4>
+                    <div class="qr-fallback">
+                        <div class="tracking-id-display">${trackingId}</div>
+                        <p style="font-size: 14px; color: #666; margin: 15px 0;">Copy this tracking ID for manual entry</p>
+                    </div>
+                    <div style="margin-top: 20px;">
+                        <button onclick="generateOnlineQR('${trackingId}')" style="background-color: #3498db; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; margin: 5px;">
+                            🌐 Generate QR Online
+                        </button>
+                        <button onclick="copyToClipboard('${trackingId}')" style="background-color: #27ae60; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; margin: 5px;">
+                            📋 Copy Tracking ID
+                        </button>
+                        <button onclick="printTextLabel('${trackingId}', '${title}', '${documentType}')" style="background-color: #f39c12; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; margin: 5px;">
+                            🖨️ Print Label
+                        </button>
+                    </div>
+                    <p style="font-size: 12px; color: #666; margin-top: 15px;">
+                        <strong>Alternatives:</strong> Visit qr-code-generator.com or use your phone's QR generator
+                    </p>
+                </div>
+            `;
+            qrCodeDiv.style.display = 'block';
+        }
+
+        // Helper Functions
+        function generateOnlineQR(text) {
+            const encodedText = encodeURIComponent(text);
+            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodedText}`;
+            window.open(qrUrl, '_blank');
+        }
+
+        function copyToClipboard(text) {
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(text).then(function() {
+                    alert(`✅ Copied to clipboard: ${text}`);
+                }).catch(function(err) {
+                    fallbackCopy(text);
+                });
+            } else {
+                fallbackCopy(text);
+            }
+        }
+
+        function fallbackCopy(text) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = "fixed";
+            textArea.style.top = "0";
+            textArea.style.left = "0";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    alert(`✅ Copied to clipboard: ${text}`);
+                } else {
+                    prompt('📋 Copy this text manually:', text);
+                }
+            } catch (err) {
+                prompt('📋 Copy this text manually:', text);
+            }
+            
+            document.body.removeChild(textArea);
+        }
+
+        // Print Functions
+        function printQRCode(trackingId, canvas) {
+            const printContent = document.getElementById('printContent');
+            const printCanvas = document.getElementById('printCanvas');
+            const printText = document.getElementById('printText');
+            const printDate = document.getElementById('printDate');
+            
+            // Copy QR code to print canvas
+            const ctx = printCanvas.getContext('2d');
+            printCanvas.width = 150;
+            printCanvas.height = 150;
+            ctx.drawImage(canvas, 0, 0, 150, 150);
+            
+            printText.textContent = trackingId;
+            printDate.textContent = new Date().toLocaleDateString();
+            
+            printContent.style.display = 'block';
+            
+            setTimeout(() => {
+                window.print();
+                setTimeout(() => {
+                    printContent.style.display = 'none';
+                }, 100);
+            }, 100);
+        }
+
+        function printTextLabel(trackingId, title, documentType) {
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>Print Label</title>
+                    <style>
+                        @page { size: 57mm auto; margin: 2mm; }
+                        body { font-family: monospace; font-size: 8pt; text-align: center; margin: 0; padding: 2mm; }
+                        .header { font-weight: bold; font-size: 9pt; margin-bottom: 2mm; }
+                        .tracking-id { font-size: 10pt; font-weight: bold; margin: 3mm 0; border: 1px solid #000; padding: 2mm; }
+                        .info { font-size: 7pt; margin: 1mm 0; }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">Document Tracking</div>
+                    <div class="tracking-id">${trackingId}</div>
+                    <div class="info">Title: ${title}</div>
+                    <div class="info">Type: ${documentType}</div>
+                    <div class="info">Date: ${new Date().toLocaleDateString()}</div>
+                    <div class="info">Local Government System</div>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+            setTimeout(() => {
+                printWindow.print();
+                printWindow.close();
+            }, 500);
+        }
+
+        // User Management
         function loadUsers() {
             const savedUsers = localStorage.getItem('users');
             if (savedUsers) {
                 users = JSON.parse(savedUsers);
             } else {
-                // First time - use default users
                 users = { ...defaultUsers };
                 saveUsers();
             }
@@ -931,80 +1133,58 @@
             localStorage.setItem('users', JSON.stringify(users));
         }
 
-        function showMainApp() {
-            document.getElementById('loginSection').classList.add('hidden');
-            document.getElementById('mainApp').classList.remove('hidden');
+        function updateUsersList() {
+            const listDiv = document.getElementById('usersList');
+            const userEntries = Object.entries(users);
             
-            // Update welcome message
-            document.getElementById('welcomeMessage').textContent = 
-                `Welcome, ${currentUser.name} (${currentUser.department})`;
-            
-            // Show appropriate navigation
-            if (currentUser.role === 'admin') {
-                document.getElementById('adminNav').classList.remove('hidden');
-            } else {
-                document.getElementById('userNav').classList.remove('hidden');
+            if (userEntries.length === 0) {
+                listDiv.innerHTML = '<p>No users found.</p>';
+                return;
             }
             
-            // Set user permissions
-            setUserPermissions();
-            
-            // Show documents section by default
-            showSection('documents');
+            listDiv.innerHTML = userEntries.map(([username, user]) => `
+                <div class="user-item">
+                    <div class="user-details">
+                        <h4>👤 ${user.name}</h4>
+                        <p><strong>Username:</strong> ${username}</p>
+                        <p><strong>Department:</strong> ${user.department}</p>
+                        <p><strong>Role:</strong> ${user.role === 'admin' ? '🔑 Administrator' : '👥 Regular User'}</p>
+                    </div>
+                    <div class="user-actions">
+                        <button class="edit-btn" onclick="editUser('${username}')">✏️ Edit</button>
+                        ${username !== 'admin' ? `<button class="delete-btn" onclick="deleteUser('${username}')">🗑️ Delete</button>` : ''}
+                    </div>
+                </div>
+            `).join('');
         }
 
-        function showSection(section) {
-            // Hide all sections
-            document.getElementById('documentFormSection').classList.add('hidden');
-            document.getElementById('scannerSection').classList.add('hidden');
-            document.getElementById('qrGeneratorSection').classList.add('hidden');
-            document.getElementById('userManagementSection').classList.add('hidden');
-            
-            // Remove active class from all buttons
-            const navButtons = document.querySelectorAll('.admin-nav button');
-            navButtons.forEach(btn => btn.classList.remove('active'));
-            
-            if (section === 'documents') {
-                document.getElementById('documentFormSection').classList.remove('hidden');
-                document.getElementById('documentsBtn')?.classList.add('active');
-                document.getElementById('userDocumentsBtn')?.classList.add('active');
-                updateDocumentsList();
-            } else if (section === 'scanner') {
-                document.getElementById('scannerSection').classList.remove('hidden');
-                document.getElementById('scannerBtn')?.classList.add('active');
-                document.getElementById('userScannerBtn')?.classList.add('active');
-            } else if (section === 'qrgenerator') {
-                document.getElementById('qrGeneratorSection').classList.remove('hidden');
-                document.getElementById('qrGeneratorBtn')?.classList.add('active');
-                document.getElementById('userQrGeneratorBtn')?.classList.add('active');
-            } else if (section === 'users' && currentUser.role === 'admin') {
-                document.getElementById('userManagementSection').classList.remove('hidden');
-                document.getElementById('usersBtn')?.classList.add('active');
+        function editUser(username) {
+            const user = users[username];
+            const newPassword = prompt(`Edit password for ${user.name}:\n\nCurrent password: ${user.password}`, user.password);
+            if (newPassword !== null && newPassword.trim() !== '') {
+                users[username].password = newPassword.trim();
+                saveUsers();
                 updateUsersList();
+                alert(`✅ Password updated for ${user.name}!`);
             }
         }
 
-        function setUserPermissions() {
-            const fromDept = document.getElementById('fromDepartment');
-            const permissionNote = document.getElementById('permissionNote');
-            const permissionText = document.getElementById('permissionText');
+        function deleteUser(username) {
+            const user = users[username];
+            if (username === currentUser.username) {
+                alert('❌ You cannot delete your own account!');
+                return;
+            }
             
-            if (currentUser.role === 'admin') {
-                // Admin can see and do everything
-                permissionText.textContent = 'You have administrator access. You can submit documents from any department, scan QR codes, and manage users.';
-                permissionNote.classList.remove('hidden');
-            } else {
-                // Regular users can only submit from their department
-                permissionText.textContent = `You can submit documents from ${currentUser.department}, scan QR codes to receive documents, and view documents sent to or from your department.`;
-                permissionNote.classList.remove('hidden');
-                
-                // Pre-select user's department and disable the field
-                fromDept.value = currentUser.department;
-                fromDept.disabled = true;
+            if (confirm(`⚠️ Delete user "${user.name}" (${username})?\n\nThis cannot be undone!`)) {
+                delete users[username];
+                saveUsers();
+                updateUsersList();
+                alert(`✅ User "${user.name}" deleted!`);
             }
         }
 
-        // QR Scanner Functions
+        // Scanner Functions
         function handleScanInput(event) {
             if (event.key === 'Enter') {
                 processScannedCode();
@@ -1019,28 +1199,24 @@
                 return;
             }
             
-            // Find the document
             const doc = documents.find(d => d.id === trackingId);
             
             if (!doc) {
-                alert(`❌ Document with tracking ID "${trackingId}" not found!`);
+                alert(`❌ Document "${trackingId}" not found!`);
                 return;
             }
             
-            // Check if this department should receive this document
             if (currentUser.role !== 'admin' && doc.to !== currentUser.department) {
-                alert(`❌ This document is not addressed to your department!\nThis document is for: ${doc.to}`);
+                alert(`❌ This document is for: ${doc.to}`);
                 return;
             }
             
-            // Show document details and actions
             showScannedDocument(doc);
         }
 
         function showScannedDocument(doc) {
             const scannedDiv = document.getElementById('scannedDocument');
             
-            // Get document type styling
             let typeClass = '';
             let typeIcon = '📄';
             if (doc.type === 'ACTIVITY DESIGN') { typeClass = 'activity'; typeIcon = '📋'; }
@@ -1097,7 +1273,6 @@
                 'forwarded': 'Forwarded'
             };
             
-            // Add status history
             if (!doc.statusHistory) doc.statusHistory = [];
             doc.statusHistory.push({
                 status: newStatus,
@@ -1113,11 +1288,8 @@
             saveDocuments();
             alert(`✅ Document status updated to: ${statusNames[newStatus]}`);
             
-            // Clear scanner
             document.getElementById('scanInput').value = '';
             document.getElementById('scannedDocument').classList.add('hidden');
-            
-            // Refresh document list if visible
             updateDocumentsList();
         }
 
@@ -1126,12 +1298,8 @@
             if (!doc) return;
             
             const departments = [
-                "Mayor's Office",
-                "Budget Office", 
-                "Accounting Office",
-                "Municipal Admin Receiving",
-                "Municipal Admin Internal",
-                "BAC"
+                "Mayor's Office", "Budget Office", "Accounting Office",
+                "Municipal Admin Receiving", "Municipal Admin Internal", "BAC"
             ];
             
             const availableDepts = departments.filter(dept => 
@@ -1143,7 +1311,7 @@
             ).join('\n');
             
             const selection = prompt(
-                `Forward document "${doc.title}" to which department?\n\n${deptList}\n\nEnter number (1-${availableDepts.length}):`
+                `Forward "${doc.title}" to:\n\n${deptList}\n\nEnter number (1-${availableDepts.length}):`
             );
             
             if (selection && selection >= 1 && selection <= availableDepts.length) {
@@ -1156,14 +1324,12 @@
             const doc = documents.find(d => d.id === trackingId);
             if (!doc) return;
             
-            // Update document routing
             doc.from = currentUser.department;
             doc.to = targetDepartment;
             doc.status = 'forwarded';
             doc.forwardedBy = currentUser.name;
             doc.forwardedAt = new Date().toLocaleString();
             
-            // Add to status history
             if (!doc.statusHistory) doc.statusHistory = [];
             doc.statusHistory.push({
                 status: 'forwarded',
@@ -1176,64 +1342,66 @@
             saveDocuments();
             alert(`✅ Document forwarded to ${targetDepartment}`);
             
-            // Clear scanner
             document.getElementById('scanInput').value = '';
             document.getElementById('scannedDocument').classList.add('hidden');
-            
             updateDocumentsList();
         }
 
-        function updateUsersList() {
-            const listDiv = document.getElementById('usersList');
+        // Application Navigation
+        function showMainApp() {
+            document.getElementById('loginSection').classList.add('hidden');
+            document.getElementById('mainApp').classList.remove('hidden');
             
-            const userEntries = Object.entries(users);
+            document.getElementById('welcomeMessage').textContent = 
+                `Welcome, ${currentUser.name} (${currentUser.department})`;
             
-            if (userEntries.length === 0) {
-                listDiv.innerHTML = '<p>No users found.</p>';
-                return;
+            if (currentUser.role === 'admin') {
+                document.getElementById('adminNav').classList.remove('hidden');
+            } else {
+                document.getElementById('userNav').classList.remove('hidden');
             }
             
-            listDiv.innerHTML = userEntries.map(([username, user]) => `
-                <div class="user-item">
-                    <div class="user-details">
-                        <h4>👤 ${user.name}</h4>
-                        <p><strong>Username:</strong> ${username}</p>
-                        <p><strong>Department:</strong> ${user.department}</p>
-                        <p><strong>Role:</strong> ${user.role === 'admin' ? '🔑 Administrator' : '👥 Regular User'}</p>
-                    </div>
-                    <div class="user-actions">
-                        <button class="edit-btn" onclick="editUser('${username}')">✏️ Edit</button>
-                        ${username !== 'admin' ? `<button class="delete-btn" onclick="deleteUser('${username}')">🗑️ Delete</button>` : ''}
-                    </div>
-                </div>
-            `).join('');
+            setUserPermissions();
+            showSection('documents');
         }
 
-        function editUser(username) {
-            const user = users[username];
+        function showSection(section) {
+            document.getElementById('documentFormSection').classList.add('hidden');
+            document.getElementById('scannerSection').classList.add('hidden');
+            document.getElementById('userManagementSection').classList.add('hidden');
             
-            const newPassword = prompt(`Edit password for ${user.name}:\n\nCurrent password: ${user.password}`, user.password);
-            if (newPassword !== null && newPassword.trim() !== '') {
-                users[username].password = newPassword.trim();
-                saveUsers();
+            const navButtons = document.querySelectorAll('.admin-nav button');
+            navButtons.forEach(btn => btn.classList.remove('active'));
+            
+            if (section === 'documents') {
+                document.getElementById('documentFormSection').classList.remove('hidden');
+                document.getElementById('documentsBtn')?.classList.add('active');
+                document.getElementById('userDocumentsBtn')?.classList.add('active');
+                updateDocumentsList();
+            } else if (section === 'scanner') {
+                document.getElementById('scannerSection').classList.remove('hidden');
+                document.getElementById('scannerBtn')?.classList.add('active');
+                document.getElementById('userScannerBtn')?.classList.add('active');
+            } else if (section === 'users' && currentUser.role === 'admin') {
+                document.getElementById('userManagementSection').classList.remove('hidden');
+                document.getElementById('usersBtn')?.classList.add('active');
                 updateUsersList();
-                alert(`✅ Password updated for ${user.name}!`);
             }
         }
 
-        function deleteUser(username) {
-            const user = users[username];
+        function setUserPermissions() {
+            const fromDept = document.getElementById('fromDepartment');
+            const permissionNote = document.getElementById('permissionNote');
+            const permissionText = document.getElementById('permissionText');
             
-            if (username === currentUser.username) {
-                alert('❌ You cannot delete your own account while logged in!');
-                return;
-            }
-            
-            if (confirm(`⚠️ Are you sure you want to delete user "${user.name}" (${username})?\n\nThis action cannot be undone!`)) {
-                delete users[username];
-                saveUsers();
-                updateUsersList();
-                alert(`✅ User "${user.name}" deleted successfully!`);
+            if (currentUser.role === 'admin') {
+                permissionText.textContent = 'Administrator access: Submit from any department, scan QR codes, manage users.';
+                permissionNote.classList.remove('hidden');
+            } else {
+                permissionText.textContent = `Submit from ${currentUser.department}, scan QR codes, view department documents.`;
+                permissionNote.classList.remove('hidden');
+                fromDept.value = currentUser.department;
+                fromDept.disabled = true;
             }
         }
 
@@ -1246,345 +1414,11 @@
             document.getElementById('adminNav').classList.add('hidden');
             document.getElementById('userNav').classList.add('hidden');
             
-            // Reset form restrictions
             document.getElementById('fromDepartment').disabled = false;
         }
 
-        // Enhanced QR Code Generation with Print Functionality
-        function generateQRCode(trackingId, title, documentType) {
-            const qrCodeDiv = document.getElementById('qrcode');
-            qrCodeDiv.innerHTML = ''; // Clear previous QR code
-            
-            // Check if QRCode library is loaded
-            if (typeof QRCode === 'undefined') {
-                console.error('QRCode library not loaded');
-                // Fallback if QR library isn't loaded
-                qrCodeDiv.innerHTML = `
-                    <div class="qr-container">
-                        <h4 style="margin: 0 0 10px 0; color: #2c3e50;">📱 QR Code</h4>
-                        <p style="font-family: monospace; font-size: 18px; font-weight: bold; color: #2c3e50; margin: 10px 0; text-align: center;">${trackingId}</p>
-                        <p style="font-size: 12px; color: #666; margin: 10px 0;">QR library not loaded - use tracking ID above</p>
-                    </div>
-                `;
-                qrCodeDiv.style.display = 'block';
-                return;
-            }
-            
-            // Create container for QR code
-            const container = document.createElement('div');
-            container.className = 'qr-container';
-            
-            const title_elem = document.createElement('h4');
-            title_elem.textContent = '📱 QR Code Generated';
-            title_elem.style.margin = '0 0 15px 0';
-            title_elem.style.color = '#2c3e50';
-            container.appendChild(title_elem);
-            
-            // Create canvas for QR code
-            const canvas = document.createElement('canvas');
-            canvas.id = 'qrCanvas';
-            container.appendChild(canvas);
-            
-            // Generate QR code
-            try {
-                QRCode.toCanvas(canvas, trackingId, {
-                    width: 200,
-                    height: 200,
-                    margin: 2,
-                    colorDark: '#2c3e50',
-                    colorLight: '#ffffff',
-                    errorCorrectionLevel: 'M'
-                }, function (error) {
-                    if (error) {
-                        console.error('QR Code generation error:', error);
-                        container.innerHTML = `
-                            <div class="qr-container">
-                                <h4>📱 Tracking ID</h4>
-                                <p style="font-family: monospace; font-size: 18px; font-weight: bold;">${trackingId}</p>
-                                <p style="font-size: 12px; color: #666;">QR code generation failed</p>
-                            </div>
-                        `;
-                    } else {
-                        // Add tracking ID text
-                        const trackingText = document.createElement('p');
-                        trackingText.innerHTML = `<strong>Tracking ID:</strong> ${trackingId}`;
-                        trackingText.style.margin = '10px 0';
-                        trackingText.style.fontFamily = 'monospace';
-                        trackingText.style.fontSize = '14px';
-                        container.appendChild(trackingText);
-                        
-                        // Add document info
-                        const docInfo = document.createElement('p');
-                        docInfo.innerHTML = `<strong>Document:</strong> ${title}<br><strong>Type:</strong> ${documentType}`;
-                        docInfo.style.margin = '10px 0';
-                        docInfo.style.fontSize = '12px';
-                        docInfo.style.color = '#666';
-                        container.appendChild(docInfo);
-                        
-                        // Add buttons
-                        const buttonContainer = document.createElement('div');
-                        buttonContainer.style.marginTop = '15px';
-                        
-                        // Download QR Code button
-                        const downloadBtn = document.createElement('button');
-                        downloadBtn.textContent = '📥 Download QR';
-                        downloadBtn.onclick = function() {
-                            const link = document.createElement('a');
-                            link.download = `QR-${trackingId}.png`;
-                            link.href = canvas.toDataURL();
-                            link.click();
-                        };
-                        buttonContainer.appendChild(downloadBtn);
-                        
-                        // Print QR Code button
-                        const printBtn = document.createElement('button');
-                        printBtn.className = 'qr-print-btn';
-                        printBtn.textContent = '🖨️ Print QR (57mm)';
-                        printBtn.onclick = function() {
-                            printQRCode(trackingId, title, documentType, canvas);
-                        };
-                        buttonContainer.appendChild(printBtn);
-                        
-                        container.appendChild(buttonContainer);
-                        
-                        // Add instructions
-                        const instructions = document.createElement('div');
-                        instructions.innerHTML = `
-                            <p style="margin-top: 15px; font-size: 14px; color: #2c3e50; text-align: left;">
-                                <strong>📋 Instructions:</strong><br>
-                                1. Print or share this QR code<br>
-                                2. Receiving department scans the QR code<br>
-                                3. They can update status and forward the document
-                            </p>
-                        `;
-                        container.appendChild(instructions);
-                    }
-                });
-            } catch (error) {
-                console.error('QR Code library error:', error);
-                container.innerHTML = `
-                    <div class="qr-container">
-                        <h4>📱 Tracking ID</h4>
-                        <p style="font-family: monospace; font-size: 18px; font-weight: bold;">${trackingId}</p>
-                        <p style="font-size: 12px; color: #666;">QR code generation failed</p>
-                    </div>
-                `;
-            }
-            
-            qrCodeDiv.appendChild(container);
-            qrCodeDiv.style.display = 'block';
-        }
-
-        // Standalone QR Generator Functions
-        function generateStandaloneQR() {
-            const text = document.getElementById('qrText').value.trim();
-            const size = parseInt(document.getElementById('qrSize').value);
-            const resultDiv = document.getElementById('standaloneQRResult');
-            
-            if (!text) {
-                alert('❌ Please enter text to generate QR code!');
-                return;
-            }
-            
-            // Clear previous result
-            resultDiv.innerHTML = '';
-            
-            // Create container
-            const container = document.createElement('div');
-            container.style.textAlign = 'center';
-            
-            // Create title
-            const title = document.createElement('h3');
-            title.textContent = '📱 Generated QR Code';
-            title.style.color = '#2c3e50';
-            title.style.marginBottom = '15px';
-            container.appendChild(title);
-            
-            // Create canvas
-            const canvas = document.createElement('canvas');
-            container.appendChild(canvas);
-            
-            // Check if QRCode library is loaded
-            if (typeof QRCode === 'undefined') {
-                container.innerHTML = `
-                    <h3>❌ QR Code Library Not Available</h3>
-                    <p>QR code generation requires an internet connection to load the QR library.</p>
-                    <p><strong>Text to encode:</strong> ${text}</p>
-                `;
-                resultDiv.appendChild(container);
-                resultDiv.classList.remove('hidden');
-                return;
-            }
-            
-            // Generate QR code
-            try {
-                QRCode.toCanvas(canvas, text, {
-                    width: size,
-                    height: size,
-                    margin: 2,
-                    colorDark: '#2c3e50',
-                    colorLight: '#ffffff',
-                    errorCorrectionLevel: 'M'
-                }, function (error) {
-                    if (error) {
-                        console.error('Standalone QR generation error:', error);
-                        container.innerHTML = `
-                            <h3>❌ QR Code Generation Failed</h3>
-                            <p>Error: ${error.message}</p>
-                            <p><strong>Text:</strong> ${text}</p>
-                        `;
-                    } else {
-                        // Add text display
-                        const textDisplay = document.createElement('p');
-                        textDisplay.innerHTML = `<strong>Encoded Text:</strong><br><code style="background-color: #f8f9fa; padding: 5px; border-radius: 3px;">${text}</code>`;
-                        textDisplay.style.margin = '15px 0';
-                        container.appendChild(textDisplay);
-                        
-                        // Add buttons
-                        const buttonContainer = document.createElement('div');
-                        buttonContainer.style.marginTop = '15px';
-                        
-                        // Download button
-                        const downloadBtn = document.createElement('button');
-                        downloadBtn.textContent = '📥 Download PNG';
-                        downloadBtn.style.backgroundColor = '#28a745';
-                        downloadBtn.onclick = function() {
-                            const link = document.createElement('a');
-                            link.download = `QR-${text.substring(0, 20).replace(/[^a-zA-Z0-9]/g, '_')}.png`;
-                            link.href = canvas.toDataURL();
-                            link.click();
-                        };
-                        buttonContainer.appendChild(downloadBtn);
-                        
-                        // Print button
-                        const printBtn = document.createElement('button');
-                        printBtn.textContent = '🖨️ Print (57mm)';
-                        printBtn.className = 'qr-print-btn';
-                        printBtn.onclick = function() {
-                            printStandaloneQR(text, canvas);
-                        };
-                        buttonContainer.appendChild(printBtn);
-                        
-                        container.appendChild(buttonContainer);
-                    }
-                    
-                    resultDiv.appendChild(container);
-                    resultDiv.classList.remove('hidden');
-                });
-            } catch (error) {
-                console.error('QR generation error:', error);
-                container.innerHTML = `
-                    <h3>❌ QR Code Generation Error</h3>
-                    <p>Failed to generate QR code</p>
-                    <p><strong>Text:</strong> ${text}</p>
-                `;
-                resultDiv.appendChild(container);
-                resultDiv.classList.remove('hidden');
-            }
-        }
-
-        function clearQRGenerator() {
-            document.getElementById('qrText').value = '';
-            document.getElementById('qrSize').value = '200';
-            document.getElementById('standaloneQRResult').classList.add('hidden');
-            document.getElementById('standaloneQRResult').innerHTML = '';
-        }
-
-        // Print QR Code for 57mm paper
-        function printQRCode(trackingId, title, documentType, originalCanvas) {
-            // Create print canvas with proper dimensions for 57mm paper
-            const printCanvas = document.getElementById('qrPrintCanvas');
-            const printSection = document.getElementById('qrPrintSection');
-            const printId = document.getElementById('qrPrintId');
-            const printDate = document.getElementById('qrPrintDate');
-            
-            // Set print information
-            printId.textContent = trackingId;
-            printDate.textContent = new Date().toLocaleDateString();
-            
-            // Generate QR code for print canvas
-            try {
-                QRCode.toCanvas(printCanvas, trackingId, {
-                    width: 150,  // Adjusted for 57mm paper
-                    height: 150,
-                    margin: 1,
-                    colorDark: '#000000',
-                    colorLight: '#ffffff',
-                    errorCorrectionLevel: 'M'
-                }, function (error) {
-                    if (error) {
-                        console.error('Print QR Code generation error:', error);
-                        alert('❌ Failed to generate QR code for printing');
-                        return;
-                    }
-                    
-                    // Show the print section temporarily and print
-                    printSection.style.display = 'block';
-                    
-                    // Use setTimeout to ensure the canvas is rendered before printing
-                    setTimeout(() => {
-                        window.print();
-                        
-                        // Hide the print section after printing
-                        setTimeout(() => {
-                            printSection.style.display = 'none';
-                        }, 100);
-                    }, 100);
-                });
-            } catch (error) {
-                console.error('Print QR error:', error);
-                alert('❌ Failed to prepare QR code for printing');
-            }
-        }
-
-        function printStandaloneQR(text, originalCanvas) {
-            // Create print canvas with proper dimensions for 57mm paper
-            const printCanvas = document.getElementById('qrPrintCanvas');
-            const printSection = document.getElementById('qrPrintSection');
-            const printId = document.getElementById('qrPrintId');
-            const printDate = document.getElementById('qrPrintDate');
-            
-            // Set print information
-            printId.textContent = text.length > 30 ? text.substring(0, 30) + '...' : text;
-            printDate.textContent = new Date().toLocaleDateString();
-            
-            // Generate QR code for print canvas
-            try {
-                QRCode.toCanvas(printCanvas, text, {
-                    width: 150,  // Adjusted for 57mm paper
-                    height: 150,
-                    margin: 1,
-                    colorDark: '#000000',
-                    colorLight: '#ffffff',
-                    errorCorrectionLevel: 'M'
-                }, function (error) {
-                    if (error) {
-                        console.error('Print QR Code generation error:', error);
-                        alert('❌ Failed to generate QR code for printing');
-                        return;
-                    }
-                    
-                    // Show the print section temporarily and print
-                    printSection.style.display = 'block';
-                    
-                    // Use setTimeout to ensure the canvas is rendered before printing
-                    setTimeout(() => {
-                        window.print();
-                        
-                        // Hide the print section after printing
-                        setTimeout(() => {
-                            printSection.style.display = 'none';
-                        }, 100);
-                    }, 100);
-                });
-            } catch (error) {
-                console.error('Print QR error:', error);
-                alert('❌ Failed to prepare QR code for printing');
-            }
-        }
-
+        // Document Management
         function updateDocumentsList() {
-            // Reset search when updating the list
             document.getElementById('documentSearch').value = '';
             document.getElementById('searchResults').textContent = '';
             
@@ -1597,7 +1431,7 @@
             if (!doc || !doc.statusHistory) return;
             
             const history = doc.statusHistory.map((entry, index) => 
-                `${index + 1}. ${entry.status.toUpperCase()} - ${entry.updatedBy} (${entry.department}) - ${entry.timestamp}${entry.forwardedTo ? ` → Forwarded to: ${entry.forwardedTo}` : ''}`
+                `${index + 1}. ${entry.status.toUpperCase()} - ${entry.updatedBy} (${entry.department}) - ${entry.timestamp}${entry.forwardedTo ? ` → ${entry.forwardedTo}` : ''}`
             ).join('\n');
             
             alert(`📊 Status History for ${doc.title}\n\n${history}`);
